@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+import sys, os, logging
+
+#to find config and other modules
+if(os.path.dirname(__file__) in sys.path):
+  pass
+else:
+  sys.path.insert(0,os.path.dirname(__file__))
+
+#to start logging and get mysql related data
+import config
+
+#logging project errors. For apache2 mod_wsgi error see /var/log/apache2/error.log
+logging.basicConfig(filename=config.log_filename,level=logging.DEBUG,force=True)  
+logging.debug("#########wsgi.py started... Logging started############")
+
+#every thing important goes in start
+import start
+
+#once apache2 reads wsgi.py it does not read again
+#It apache2 now uses application() everytime browser action occure
+#so previous messages are logged only once
+#but application() logging occure with every browser activity
+#start.py is not executed. Its function is used 
+
+def application(environ, start_response):
+    status = '200 OK'
+    logging.debug("-------wsgi.py application() entered---------")
+
+    #from start get data to be returned
+    ret=start.do_work()
+    response_headers = [('Content-type', 'text/html'),
+                        ('Content-Length', "100")]
+
+    start_response(status, response_headers)
+    return ret
+
+

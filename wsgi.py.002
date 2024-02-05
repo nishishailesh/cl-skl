@@ -1,0 +1,48 @@
+#!/usr/bin/python3
+import sys, os, logging
+
+#?????
+#os.chdir(os.path.dirname(__file__))
+#os.chdir(os.path.dirname(__file__))
+#to import modules from project directory
+#__init__.py in this and all other subfolder will make module search successful
+#sys.path.append('/root/projects/skl')
+#sys.path.append(os.path.dirname(__file__))
+
+if(os.path.dirname(__file__) in sys.path):
+  pass
+else:
+  sys.path.insert(0,os.path.dirname(__file__))
+
+import config
+
+logging.basicConfig(filename=config.log_filename,level=logging.DEBUG,force=True)  
+logging.debug("wsgi.py started... Logging started..")
+logging.debug("wsgi.py:sys.path-->{}".format(sys.path))
+logging.debug("wsgi.py:CWD-->{}".format(os.getcwd()))
+logging.debug("wsgi.py:path of file-->{}".format(os.path.dirname(__file__)))
+
+import start
+import common_modules.common_mysql
+
+#from common_modules import *
+#import common_mysql
+#import he
+
+def application(environ, start_response):
+    status = '200 OK'
+    output = b'Hello World!s'
+
+    if not environ['mod_wsgi.process_group']:
+      output = b'EMBEDDED MODE'
+    else:
+      output = b'DAEMON MODE'
+      
+    ret=start.do_work()
+    response_headers = [('Content-type', 'text/html'),
+                        ('Content-Length', "100")]
+
+    start_response(status, response_headers)
+    return ret
+
+

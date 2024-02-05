@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+import sys, os, logging
+
+#to find config and other modules
+if(os.path.dirname(__file__) in sys.path):
+  pass
+else:
+  sys.path.insert(0,os.path.dirname(__file__))
+
+#to start logging and get mysql related data
+import config
+
+#logging project errors. For apache2 mod_wsgi error see /var/log/apache2/error.log
+logging.basicConfig(filename=config.log_filename,level=logging.DEBUG,force=True)  
+logging.debug("#########wsgi.py started... Logging started############")
+
+#every thing important goes in start
+import start
+'''
+This is run once only when wsgi.py is loaded.  
+Afterwords only functions taken from start.py are rerun 
+on further web activity only appication() is rerun
+So, donot put anything outside appication(), except importing and logging
+'''
+
+
+#once apache2 reads wsgi.py it does not read again (unless wsgi is altered or apache2 restarted with mod_wsgi daemon mode)
+#daemon mode defined in apache configuration of the site
+#example:    WSGIDaemonProcess Pone  user=www-data group=www-data processes=2 threads=15
+
+#apache2 now uses application() everytime browser action occure
+#so previous messages are logged only once
+#but application() logging occure with every browser activity 
+#start.py is not executed. Its function is used
+#if any global variables are used, they will be avalible across browser and tabs   
+
+def application(environ, start_response):
+    status = '200 OK'
+    logging.debug("-------wsgi.py application() entered---------")
+
+    #from start get data to be returned
+    ret=start.do_work(environ)
+    
+    #calculate size of ret
+    response_headers = [('Content-type', 'text/html'),
+                        ('Content-Length', str(len(b''.join(ret))))]
+
+    start_response(status, response_headers)
+    return ret
+
+

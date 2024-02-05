@@ -1,0 +1,39 @@
+import sys, logging, os
+import config, time
+#logging.basicConfig(filename=config.log_filename,level=logging.DEBUG,force=True)  
+
+import common_modules.common_mysql
+
+y='{}'.format(time.time()).encode("UTF-8")
+logging.debug("start.py:time OUTSIDE FUNCTION-->{}".format(y))
+#Above will be logged when wsgi loads start.py (only once ? or more depending on apache2?)
+
+def do_work(environ):
+    dd='{}'.format(time.time())
+    logging.debug("start.py:do_work():time-->{}".format(dd))
+    x=dd.encode("UTF-8")
+    return [
+    login(),
+    echo_post(environ)
+    ]
+
+def login():
+  form='''<html>
+  <form method=post>
+  <input type=text name=username>
+  <input type=password name=password>
+  <input type=submit name=action>
+  <form>
+  </html>'''
+  return form.encode("UTF-8")
+
+
+def echo_post(environ):
+  try:
+    request_body_size = int(environ.get('CONTENT_LENGTH', 0))
+  except (ValueError):
+    request_body_size = 0
+
+  #environ['wsgi.input'] is file like object
+  request_body = environ['wsgi.input'].read(request_body_size)
+  return '<pre>{}<hr>{}</pre>'.format(environ,request_body).encode("UTF-8")

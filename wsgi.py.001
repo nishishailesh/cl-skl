@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+import os
+def application(environ, start_response):
+    final=[b'start']
+    status = '200 OK'
+    output = b'Hello World!s'
+
+    if not environ['mod_wsgi.process_group']:
+      output = b'EMBEDDED MODE'
+    else:
+      output = b'DAEMON MODE'
+      
+    ret=do_work(final)
+    response_headers = [('Content-type', 'text/html'),
+                        ('Content-Length', "100")]
+
+
+    start_response(status, response_headers)
+
+    return ret+[output] #list of bytesString
+
+def do_work(final):
+    final=final+[b'xyz']
+    final=final+[b'abc']
+    final=final+[b'<img src="skl_static/x.jpg">']
+    '''
+    static file can best be managed by adding a line in /etc/apache2/conf-enabled/myproject.conf 
+    For example:
+    Alias /skl_static /root/projects/skl
+    38th 
+    '''
+    return final
+    '''
+    return must be list of byteString
+    [b'one', b'two', b'three']
+    '''
+

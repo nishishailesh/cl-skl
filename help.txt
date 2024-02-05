@@ -1,0 +1,17 @@
+This is demonstration of minimal mod_wsgi project
+This is useful
+  -to understand so called web framework - how they work with python and apache2
+  -to use actually for application where framework is overkill
+
+
+following is exammple of /etc/apache2/conf-enabled/myproject.conf file.
+============
+    WSGIScriptAlias /skl /root/projects/skl/wsgi.py
+    <Directory /root/projects/skl>
+        WSGIProcessGroup Pone
+        WSGIApplicationGroup %{GLOBAL}
+        Require all granted
+    </Directory>
+
+Alias /skl_static /root/projects/skl
+=============
